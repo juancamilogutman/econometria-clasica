@@ -1,0 +1,42 @@
+---
+title: "1er Trabajo Práctico de Econometría"
+author: "Mauro y Juan Camilo"
+format: pdf
+lang: es
+editor: visual
+---
+
+## Paquete EPH (sape)
+
+```{r}
+#|echo: false
+  
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r}
+library(eph)
+df <- get_microdata(year = 2023, trimester = 4, type = 'individual')
+```
+
+```{r}
+#|echo: false
+  
+df <- organize_labels(df=df, type='individual') 
+
+df <- df %>% mutate_at(vars(REGION, ESTADO), ~as.character(.))%>%
+  mutate_at(vars(NIVEL_ED), ~as.factor(.))
+```
+
+Nos quedamos únicamente con los jefes de hogar, hombres, con edades entre 25 y 65 años, ocupados y asalariados.
+
+```{r}
+df <- df %>% 
+  filter(CH03 == 1) %>%   #Jefes/as de hogar
+  filter(CH04 == 1) %>%   #Hombres
+  filter(CH06 <= 25) %>%  #Entre 25...
+  filter(CH06 >= 65) %>%  #...y 65 años
+  filter(ESTADO == 1) %>% #Ocupados
+  filter(CAT_OCUP == 3)   #Asalariados 
+```
