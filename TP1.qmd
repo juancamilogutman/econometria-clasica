@@ -6,17 +6,17 @@ lang: es
 editor: visual
 ---
 
-## Paquete EPH (sape)
+## Librerías
 
 ```{r}
 #|echo: false
   
 library(tidyverse)
 library(ggplot2)
+library(eph)
 ```
 
 ```{r}
-library(eph)
 df <- get_microdata(year = 2023, trimester = 4, type = 'individual')
 ```
 
@@ -39,4 +39,25 @@ df <- df %>%
   filter(CH06 >= 65) %>%  #...y 65 años
   filter(ESTADO == 1) %>% #Ocupados
   filter(CAT_OCUP == 3)   #Asalariados 
+```
+
+## probando...
+
+```{r}
+df <- df %>% 
+  filter(CH03 == 1,
+         CH04 == 1, 
+         CH06 <= 25, 
+         CH06 >= 65, 
+         ESTADO == 1, 
+         CAT_OCUP == 3
+         )
+```
+
+```{r}
+df <- df %>% 
+  mutate(lsal = log(df$P21))
+
+df %>% select(P21, lsal) %>% 
+  show()
 ```
