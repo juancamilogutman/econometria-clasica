@@ -9,13 +9,20 @@ editor: visual
 ## Librerías
 
 ```{r}
-#|output: false
+#| output: false
+
+library(tidyverse)    #Para manejar bases de datos
+library(ggplot2)      #Para graficar
+library(eph)          #Librería hecha por científicos argentinos
+library(tinytable)    #Para las tablas
+library(modelsummary) #Mejores tablas de regresión 
+```
+
+```{r}
 #| include: false
 
-library(tidyverse) #Para manejar bases de datos
-library(ggplot2)
-library(eph)   
-library(knitr)     #Para las tablas
+options(tinytable_tt_digits = 3)
+options(tinytable_theme_placement_latex_float = "H")
 ```
 
 ```{r}
@@ -47,7 +54,7 @@ df2 <- df %>%
                    )
 ```
 
-Generamos las variables que necesitamos:
+Generamos las variables que necesitamos, lo cual se ve en @tbl-salario:
 
 ```{r}
 #| label: tbl-salario
@@ -61,11 +68,15 @@ df2 <- df2 %>%
 tabla <- df2 %>% 
   select(c("P21", "logSal"))
 
-knitr::kable(head(tabla))
+tt(tabla)
 ```
 
+En @tbl-mincer pueden leerse los resultados de la primer regresión.
+
 ```{r}
+#| label: tbl-mincer
+#| tbl-cap: "Ecuación de Mincer"
 
 Regresion1 <- lm(logSal ~ CH06 + CH12, data = df2)
-summary(Regresion1)
+modelsummary(Regresion1)
 ```
