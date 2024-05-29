@@ -26,30 +26,31 @@ options(tinytable_theme_placement_latex_float = "H")
 ```
 
 ```{r}
-df <- get_microdata(year = 2023, trimester = 4, type = 'individual')
+#| include: false
+
+df <- get_microdata(year = 2023, trimester = 4, type = 'individual') %>% 
+organize_labels(type='individual') 
 ```
 
 ```{r}
-#| echo: false
 #| include: false
 
-df <- organize_labels(df=df, type='individual') 
-
-df <- df %>% mutate_at(vars(REGION, ESTADO), ~as.character(.))%>%
-  mutate_at(vars(NIVEL_ED), ~as.factor(.))
+df <- df %>% mutate_at(vars(NIVEL_ED, AGLOMERADO, CH07, ESTADO, REGION), ~as.factor(.))
 ```
 
 Nos quedamos únicamente con los jefes de hogar, hombres, con edades entre 25 y 65 años, ocupados y asalariados.
 
 ```{r}
-df2 <- df %>% 
+#| output: false
+
+df <- df %>% 
   filter(CH03 == 1,           #Jefes/as de hogar
          CH04 == 1,           #Hombres          
          CH06 >= 25,          #Entre 25...      
          CH06 <= 65,          #...y 65 años     
          ESTADO == "Ocupado", #Ocupados         
-         CAT_OCUP == 3,       #Asalariados
-         P21 > 0,             #Salario positivo
+         CAT_OCUP == 3,       #Asalariados      
+         P21 > 0,             #Salario positivo 
          CH12 < 9             #Todos los niveles educ salvo 'educ especial'
                    )
 ```
@@ -62,10 +63,10 @@ Generamos las variables que necesitamos, lo cual se ve en @tbl-salario:
 #| echo: false
 #| include: false
 
-df2 <- df2 %>% 
-  mutate(logSal = log(df2$P21))
+df <- df %>% 
+  mutate(logSal = log(df$P21))
 
-tabla <- df2 %>% 
+tabla <- df %>% 
   select(c("P21", "logSal"))
 
 tt(tabla)
@@ -77,6 +78,9 @@ En @tbl-mincer pueden leerse los resultados de la primer regresión.
 #| label: tbl-mincer
 #| tbl-cap: "Ecuación de Mincer"
 
-Regresion1 <- lm(logSal ~ CH06 + CH12, data = df2)
-modelsummary(Regresion1)
+reg1 <- lm(logSal ~ CH06 + NIVEL_ED + CH07 + AGLOMERADO, data = df)
+
+reg2 <- lm(logSal ~ CH06 + NIVEL_ED + CH07 + REGION, data = df)
+
+modelsummary(list("Por Aglomerado" = reg1,"Por Región" = reg2). longtable = TRUE)
 ```
