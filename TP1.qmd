@@ -1,9 +1,13 @@
 ---
 title: "1er Trabajo Práctico de Econometría"
 author: "Mauro y Juan Camilo"
-format: pdf
 lang: es
 editor: visual
+format:
+  pdf:
+    include-in-header: 
+      text: |
+        \usepackage{typearea}
 ---
 
 ## Librerías
@@ -55,32 +59,72 @@ df <- df %>%
                    )
 ```
 
+```{# {r}
+# #Creamos una nueva variable, de años de educación:
+# 
+# #Antes filtrar los de no sabe no contesta
+# df <- df %>%
+#   drop_na(CH14) %>%
+#   
+#   mutate(CH14 = case_when(
+#     CH13 == 2 ~ CH14,
+#     TRUE ~ 0
+#   )) %>%
+#   
+#   mutate(ANIOS_ED = case_when(  #Nivel más alto alcanzado:
+#     CH12 == 2 ~ CH14,           #Primario      
+#     CH12 == 3 ~ CH14,           #EGB           
+#     CH12 == 4 ~ (7 + CH14),     #Secundario    
+#     CH12 == 5 ~ (9 + CH14),     #Polimodal     
+#     CH12 == 6 ~ (12 + CH14),    #Terciario     
+#     CH12 == 7 ~ (12 + CH14),    #Universitario 
+#     CH12 == 8 ~ (12 + CH14),    #Posgrado Univ.
+#     TRUE ~ 0
+#   ))
+```
+
 Generamos las variables que necesitamos, lo cual se ve en @tbl-salario:
 
 ```{r}
-#| label: tbl-salario
-#| tbl-cap: "Salario"
 #| echo: false
-#| include: false
+# label: tbl-salario
+# tbl-cap: "Salario"
+
 
 df <- df %>% 
   mutate(logSal = log(df$P21))
 
-tabla <- df %>% 
-  select(c("P21", "logSal"))
-
-tt(tabla)
+# tabla <- df %>% 
+#   select(c("P21", "logSal"))
+# 
+# tt(tabla)
 ```
+
+\newpage
+
+\KOMAoptions{paper=landscape,pagesize}
+
+\recalctypearea
 
 En @tbl-mincer pueden leerse los resultados de la primer regresión.
 
 ```{r}
 #| label: tbl-mincer
 #| tbl-cap: "Ecuación de Mincer"
+#| echo: false
 
 reg1 <- lm(logSal ~ CH06 + NIVEL_ED + CH07 + AGLOMERADO, data = df)
 
 reg2 <- lm(logSal ~ CH06 + NIVEL_ED + CH07 + REGION, data = df)
 
-modelsummary(list("Por Aglomerado" = reg1,"Por Región" = reg2). longtable = TRUE)
+sum <- modelsummary(list("Por Aglomerado" = reg1,"Por Región" = reg2), width = 0.8, cap = "Juanca")
+
+sum %>% 
+  theme_tt("multipage", rowhead = 1)
 ```
+
+\newpage
+
+\KOMAoptions{paper=portrait,pagesize}
+
+\recalctypearea
