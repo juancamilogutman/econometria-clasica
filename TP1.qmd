@@ -32,8 +32,9 @@ options(tinytable_theme_placement_latex_float = "H")
 ```{r}
 #| include: false
 
-df <- get_microdata(year = 2023, trimester = 4, type = 'individual') %>% 
-organize_labels(type='individual') 
+df <- get_microdata(year = 2023, trimester = 4, type = 'individual')
+# %>% 
+# organize_labels(type='individual') 
 ```
 
 ```{r}
@@ -52,52 +53,63 @@ df <- df %>%
          CH04 == 1,           #Hombres          
          CH06 >= 25,          #Entre 25...      
          CH06 <= 65,          #...y 65 años     
-         ESTADO == "Ocupado", #Ocupados         
+         ESTADO == 1,         #Ocupados         
          CAT_OCUP == 3,       #Asalariados      
          P21 > 0,             #Salario positivo 
-         CH12 < 9             #Todos los niveles educ salvo 'educ especial'
-                   )
+         CH12 < 9             #¬Educación espec.
+         )
 ```
 
-```{# {r}
-# #Creamos una nueva variable, de años de educación:
-# 
-# #Antes filtrar los de no sabe no contesta
-# df <- df %>%
-#   drop_na(CH14) %>%
-#   
-#   mutate(CH14 = case_when(
-#     CH13 == 2 ~ CH14,
-#     TRUE ~ 0
-#   )) %>%
-#   
-#   mutate(ANIOS_ED = case_when(  #Nivel más alto alcanzado:
-#     CH12 == 2 ~ CH14,           #Primario      
-#     CH12 == 3 ~ CH14,           #EGB           
-#     CH12 == 4 ~ (7 + CH14),     #Secundario    
-#     CH12 == 5 ~ (9 + CH14),     #Polimodal     
-#     CH12 == 6 ~ (12 + CH14),    #Terciario     
-#     CH12 == 7 ~ (12 + CH14),    #Universitario 
-#     CH12 == 8 ~ (12 + CH14),    #Posgrado Univ.
-#     TRUE ~ 0
-#   ))
-```
-
-Generamos las variables que necesitamos, lo cual se ve en @tbl-salario:
+Habría que mencionar algo sobre la base resultante y un mínimo análisis exploratorio.
 
 ```{r}
-#| echo: false
-# label: tbl-salario
-# tbl-cap: "Salario"
 
+df <- df %>%
+  mutate(CH14 = case_when(
+    CH13 != 2 ~ 0
+    )
+  )
+```
 
+```{r}
+# Generación de la variable de años de educación
+df <- df %>%
+  mutate(ult_anio = as.numeric(CH14)) %>%
+  mutate(ANIOS_ED = case_when(
+    CH12 == 2 ~ ult_anio,             # Primario
+    CH12 == 3 ~ ult_anio,             # EGB
+    CH12 == 4 ~ (7 + ult_anio),       # Secundario
+    CH12 == 5 ~ (9 + ult_anio),       # Polimodal
+    CH12 == 6 ~ (12 + ult_anio),      # Terciario
+    CH12 == 7 ~ (12 + ult_anio),      # Universitario
+    CH12 == 8 ~ (12 + ult_anio),      # Posgrado Univ.
+    TRUE ~ 0
+  ))
+
+#Cuadrado de los años de educación
 df <- df %>% 
-  mutate(logSal = log(df$P21))
+  mutate(ANIOS_ED_SQ = (ANIOS_ED)^2)
 
-# tabla <- df %>% 
-#   select(c("P21", "logSal"))
+#Logaritmo del Salario
+df <- df %>% 
+  mutate(logSal = log(df$P21)
+  )
+
+```
+
+```{r}
+# library(plotly)
 # 
-# tt(tabla)
+# # Create a histogram for the CH12 column
+# fig <- plot_ly(df, x = ~CH12, type = "histogram", histnorm = "probability",
+#                marker = list(color = "#1f77b4"), opacity = 0.7) %>%
+#        layout(title = "Distribution of Years of Education (CH12)",
+#               xaxis = list(title = "Years of Education"),
+#               yaxis = list(title = "Probability"))
+# 
+# # Show the plot
+# fig
+
 ```
 
 \newpage
