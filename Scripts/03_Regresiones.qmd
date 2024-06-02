@@ -1,0 +1,61 @@
+---
+title: "1er Trabajo Práctico de Econometría"
+author: "Mauro y Juan Camilo"
+lang: es
+editor: visual
+format:
+  pdf:
+    include-in-header: 
+      text: |
+        \usepackage{typearea}
+---
+
+## Librerías
+
+```{r}
+#| output: false
+
+library(tidyverse)    #Para manejar bases de datos
+library(ggplot2)      #Para graficar
+library(modelsummary) #Mejores tablas de regresión 
+library(tinytable)    #Motor de creación de tablas
+```
+
+```{r}
+#| include: false
+
+options(tinytable_tt_digits = 3)
+options(tinytable_theme_placement_latex_float = "H")
+```
+
+Nos quedamos únicamente con los jefes de hogar, hombres, con edades entre 25 y 65 años, ocupados y asalariados. Habría que mencionar algo sobre la base resultante (y cuantos datos estamos descartando) y un mínimo análisis exploratorio.
+
+
+\newpage
+
+\KOMAoptions{paper=landscape,pagesize}
+
+\recalctypearea
+
+En @tbl-mincer pueden leerse los resultados de la primer regresión.
+
+```{r}
+#| label: tbl-mincer
+#| tbl-cap: "Ecuación de Mincer"
+#| echo: false
+
+reg1 <- lm(logSal ~ CH06 + NIVEL_ED + CH07 + AGLOMERADO, data = df)
+
+reg2 <- lm(logSal ~ CH06 + NIVEL_ED + CH07 + REGION, data = df)
+
+sum <- modelsummary(list("Por Aglomerado" = reg1,"Por Región" = reg2), width = 0.8, cap = "Juanca")
+
+sum %>% 
+  theme_tt("multipage", rowhead = 1)
+```
+
+\newpage
+
+\KOMAoptions{paper=portrait,pagesize}
+
+\recalctypearea
