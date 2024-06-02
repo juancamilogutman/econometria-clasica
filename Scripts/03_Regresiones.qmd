@@ -28,8 +28,13 @@ options(tinytable_tt_digits = 3)
 options(tinytable_theme_placement_latex_float = "H")
 ```
 
-Nos quedamos únicamente con los jefes de hogar, hombres, con edades entre 25 y 65 años, ocupados y asalariados. Habría que mencionar algo sobre la base resultante (y cuantos datos estamos descartando) y un mínimo análisis exploratorio.
+```{r}
+df1 <- readRDS("../Bases/eph_1abc.RDS")
+# df2 <- readRDS("Bases/eph_1de.RDS")
 
+```
+
+Nos quedamos únicamente con los jefes de hogar, hombres, con edades entre 25 y 65 años, ocupados y asalariados. Habría que mencionar algo sobre la base resultante (y cuantos datos estamos descartando) y un mínimo análisis exploratorio.
 
 \newpage
 
